@@ -112,7 +112,6 @@ class Header:
         "H"  # u16:     window
         "H"  # u16:     checksum
         "H"  # u16:     urgent_pointer
-        # "s"  # [u8; 3]: options bytes
     )
 
     def header_length_bytes(self) -> int:
