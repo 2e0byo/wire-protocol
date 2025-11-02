@@ -26,6 +26,7 @@
             pkgs.curl
             pkgs.inetutils
             pkgs.wireshark
+            pkgs.ruff
             (pkgs.python3.withPackages (ps: [ ps.httpx ps.fastapi ps.uvicorn ps.ipython ]))
           ];
         };
