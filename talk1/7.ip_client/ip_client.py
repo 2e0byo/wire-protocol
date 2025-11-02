@@ -332,3 +332,23 @@ content-length: 11\r
 content-type: text/plain; charset=utf-8\r
 \r
 """)
+
+    def test_roundtrips_from_wireshark_capture_of_request(self):
+        raw_header = "e9bc1f4027c9123f749c4fe480180200fe7600000101080a4a03ce6a4a03ce6a"
+        raw_payload = "474554202f20485454502f312e310d0a486f73743a206c6f63616c686f73743a383030300d0a557365722d4167656e743a206375726c2f382e31362e300d0a4163636570743a202a2f2a0d0a0d0a"
+        raw_data = bytes.fromhex(raw_header + raw_payload)
+
+        parsed = Header.parse_raw(raw_data)
+        dumped = parsed.into_raw() + raw_data[parsed.header_length_bytes() :]
+
+        assert dumped == raw_data
+
+    def test_roundtrips_from_wireshark_capture_of_response(self):
+        raw_header = "1f40e9bc749c4fe427c9128d80180200feae00000101080a4a03ce6b4a03ce6a"
+        raw_payload = "485454502f312e3120323030204f4b0d0a646174653a205361742c203031204e6f7620323032352031353a30303a353320474d540d0a7365727665723a20757669636f726e0d0a636f6e74656e742d6c656e6774683a2031310d0a636f6e74656e742d747970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a"
+        raw_data = bytes.fromhex(raw_header + raw_payload)
+
+        parsed = Header.parse_raw(raw_data)
+        dumped = parsed.into_raw() + raw_data[parsed.header_length_bytes() :]
+
+        assert dumped == raw_data
