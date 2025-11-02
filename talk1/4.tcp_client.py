@@ -52,13 +52,19 @@ def get(srv: str, port: int = 80, path: str = "/") -> Response:
                 state = "header"
             case (b"\r\n", "header"):
                 state = "body"
+                break
             case (header, "header"):
                 k, _, v = header.partition(b": ")
                 headers[k.decode().lower()].append(v.decode().strip())
-            case (data, "body"):
-                body += data
-        if (length := headers.get("content-length")) and len(body) == length[0]:
-            break
+
+    assert state == "body"
+    if (length := headers.get("content-length")):
+        # headers is a dict[str, list[str]]
+        length = int(length[0])
+        body = sock.recv(length)
+        assert len(body) == length
+    else:
+        body = b"".join(lines(sock))
 
     return Response(status, dict(headers), body.decode())
 
