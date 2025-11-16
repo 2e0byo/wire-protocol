@@ -18,7 +18,7 @@ class Flags:
     # is_accurate_ecn
     # is_congestion_window_reduced
     # is ecn_echo
-    is_urgent: bool
+    urgent_data_follows: bool
     is_acknowledgement: bool
     is_push: bool
     is_reset: bool
@@ -49,10 +49,10 @@ class Flags:
         data >>= 1
         is_acknowledgement = bool(data & 1)
         data >>= 1
-        is_urgent = bool(data & 1)
+        urgent_data_follows = bool(data & 1)
 
         return cls(
-            is_urgent,
+            urgent_data_follows,
             is_acknowledgement,
             is_push,
             is_reset,
@@ -72,7 +72,7 @@ class Flags:
         # 0b0011_0000 << 2 == 0b1100_0000
 
         # bitwise or with bool interpreted as int = set LSB if bool
-        data |= self.is_urgent
+        data |= self.urgent_data_follows
         data <<= 1
         data |= self.is_acknowledgement
         data <<= 1
@@ -178,7 +178,7 @@ class TestFlags:
             (0b0000_0100, "is_reset"),
             (0b0000_1000, "is_push"),
             (0b0001_0000, "is_acknowledgement"),
-            (0b0010_0000, "is_urgent"),
+            (0b0010_0000, "urgent_data_follows"),
         ],
     )
     def test_attr_parsed_from_correct_bit(self, raw: int, attr: str):
@@ -211,7 +211,7 @@ class TestFlags:
         assert parsed.is_reset
         assert parsed.is_push
         assert not parsed.is_acknowledgement
-        assert parsed.is_urgent
+        assert parsed.urgent_data_follows
 
 
 class TestHeader:
@@ -223,7 +223,7 @@ class TestHeader:
             acknowledgment_number=2,
             data_offset=8,  # not actually correct...
             flags=Flags(
-                is_urgent=True,
+                urgent_data_follows=True,
                 is_acknowledgement=True,
                 is_push=False,
                 is_reset=False,
@@ -253,7 +253,7 @@ class TestHeader:
         assert parsed.sequence_number == 1956401123
         assert parsed.acknowledgment_number == 667488831
         assert parsed.data_offset == 10  # todo handle data offset
-        assert not parsed.flags.is_urgent
+        assert not parsed.flags.urgent_data_follows
         assert parsed.flags.is_acknowledgement
         assert not parsed.flags.is_push
         assert not parsed.flags.is_reset
@@ -278,7 +278,7 @@ class TestHeader:
         assert parsed.acknowledgment_number == 1956401124
         assert parsed.sequence_number == 667488831
         assert parsed.data_offset == 8
-        assert not parsed.flags.is_urgent
+        assert not parsed.flags.urgent_data_follows
         assert parsed.flags.is_acknowledgement
         assert parsed.flags.is_push
         assert not parsed.flags.is_reset
@@ -310,7 +310,7 @@ Accept: */*\r
         assert parsed.sequence_number == 1956401124
         assert parsed.acknowledgment_number == 667488909
         assert parsed.data_offset == 8
-        assert not parsed.flags.is_urgent
+        assert not parsed.flags.urgent_data_follows
         assert parsed.flags.is_acknowledgement
         assert parsed.flags.is_push
         assert not parsed.flags.is_reset
