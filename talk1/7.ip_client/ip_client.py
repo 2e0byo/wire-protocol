@@ -168,7 +168,6 @@ class Header:
         )
 
 
-#  Header = struct.Struct("")
 class TestFlags:
     @pytest.mark.parametrize(
         "raw,attr",
